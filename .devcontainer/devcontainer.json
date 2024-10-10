@@ -8,5 +8,6 @@
 				"ms-toolsai.jupyter"
 			]
 		}
-	}
+	},
+	"runArgs": ["--env-file", ".env"]
 }
