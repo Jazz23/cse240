@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node-terminal",
+            "request": "launch",
+            "name": "Launch Program",
+            "command": "python3 -m autograder.run.submit --user $EMAIL --pass $PASSWORD Ass*.ipynb",
+            "envFile": "${workspaceFolder}/.env",
+            "cwd": "${workspaceFolder}/Assignment${input:assignmentNumber}"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "assignmentNumber",
+            "type": "promptString",
+            "description": "Enter Assignment number"
+        }
+    ]
+}
