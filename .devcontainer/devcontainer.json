@@ -1,7 +1,10 @@
 {
 	"name": "Python 3",
 	"image": "mcr.microsoft.com/devcontainers/python:1-3.12-bullseye",
-	"postCreateCommand": "pip3 install --user -r requirements.txt && git remote add upstream https://github.com/ucsc-cse-240/assignments.git && git fetch upstream",
+	"postCreateCommand": {
+		"python": "pip3 install --user -r requirements.txt",
+		"git": "git remote add upstream https://github.com/ucsc-cse-240/assignments.git && git fetch upstream"
+	},
 	"customizations": {
 		"vscode": {
 			"extensions": [

@@ -4,7 +4,7 @@
         {
             "type": "node-terminal",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Submit Autograder",
             "command": "python3 -m autograder.run.submit --user $EMAIL --pass $PASSWORD Ass*.ipynb",
             "envFile": "${workspaceFolder}/.env",
             "cwd": "${workspaceFolder}/Assignment${input:assignmentNumber}"
