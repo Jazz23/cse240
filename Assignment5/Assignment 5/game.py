@@ -57,6 +57,7 @@ class SnakeGame:
             state = self.env.get_state()
             points = self.env.get_points()
             dead = False
+            self.env.display()
             action = self.agent.agent_action(state, points, dead)
             
             while not dead:

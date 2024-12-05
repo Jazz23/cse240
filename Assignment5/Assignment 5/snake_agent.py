@@ -19,14 +19,14 @@ class SnakeAgent:
     #           the q-table
     def __init__(self, actions, Ne, LPC, gamma):
         self.actions = actions
-        self.Ne = Ne
-        self.LPC = LPC
+        self.Ne = Ne # Epsilon
+        self.LPC = LPC # Alpha
         self.gamma = gamma
         self.reset()
 
         # Create the Q and N Table to work with
-        self.Q = helper.initialize_q_as_zeros()
-        self.N = helper.initialize_q_as_zeros()
+        self.Q = helper.initialize_q_as_zeros() # Q table (index like self.Q[idx])
+        self.N = helper.initialize_q_as_zeros() # N table (index like self.N[idx])
 
     #   This function sets if the program is in training mode or testing mode.
 
@@ -153,7 +153,8 @@ class SnakeAgent:
                 idx[ADJOINING_BODY_RIGHT] = 1
                 break
             
-        return idx
+        # Convert to tuple and return
+        return tuple(idx)
             
             
     # Computing the reward, need not be changed.
@@ -186,17 +187,13 @@ class SnakeAgent:
     #   ie. (0 or 1 or 2 or 3) respectively.
     #   The parameters defined should be enough. If you want to describe more elaborate
     #   states as mentioned in helper_func, use the state variable to contain all that.
-
-    # state is [        return [
-    #         self.snake_head_x,
-    #         self.snake_head_y,
-    #         self.snake_body,
-    #         self.food_x,
-    #         self.food_y
-    #     ]]
     def agent_action(self, state: list[int], points, dead):
         print("IN AGENT_ACTION")
         idx = self.helper_func(state)
+        actions = self.Q[idx] # Weighted actions to take
+        print(idx)
+        
+        action = 0
         # YOUR CODE HERE
         # YOUR CODE HERE
         # YOUR CODE HERE
@@ -206,4 +203,4 @@ class SnakeAgent:
         # YOUR CODE HERE
 
         # UNCOMMENT THIS TO RETURN THE REQUIRED ACTION.
-        # return action
+        return action
