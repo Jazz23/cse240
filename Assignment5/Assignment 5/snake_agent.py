@@ -80,48 +80,82 @@ class SnakeAgent:
         FOOD_X = 3
         FOOD_Y = 4
         
-        # delta_x = delta_y = 0
-        # if action == 0: # Up
-        #     delta_y = -1 * helper.GRID_SIZE
-        # elif action == 1: # Down
-        #     delta_y = helper.GRID_SIZE
-        # elif action == 2: # Left
-        #     delta_x = -1 * helper.GRID_SIZE
-        # elif action == 3: # Right
-        #     delta_x = helper.GRID_SIZE
-        
-        # GRID_SIZE = 40 # 40 pixels for each square
-        #   dead on hitting wall
-        # if (self.snake_head_x < helper.GRID_SIZE or self.snake_head_y < helper.GRID_SIZE or
-        #     self.snake_head_x + helper.GRID_SIZE > helper.DISPLAY_SIZE-helper.GRID_SIZE or self.snake_head_y + helper.GRID_SIZE > helper.DISPLAY_SIZE-helper.GRID_SIZE):
-        #     return True
-        
+        # Return vector
         idx: list[int] = [0] * 8
         
-        # ADJOINING_WALL_X
-        if self.snake_head_x - helper.GRID_SIZE < helper.GRID_SIZE:
-            # There is a wall to the left
+        # Adjoining wall inference is taken from board.py Snake.move() hit wall clauses
+        
+        # ADJOINING_WALL_X, 0 if wall to the left, 1 if no wall to the left or right (in the same row), 2 if wall to the right
+        if state[SNAKE_HEAD_X] - helper.GRID_SIZE < helper.GRID_SIZE:
             idx[ADJOINING_WALL_X] = 0
-        elif self.snake_head_x + helper.GRID_SIZE > helper.DISPLAY_SIZE - helper.GRID_SIZE:
-            # There is a wall to the right
+        elif state[SNAKE_HEAD_X] + helper.GRID_SIZE > helper.DISPLAY_SIZE - helper.GRID_SIZE:
             idx[ADJOINING_WALL_X] = 2
         else:
-            # There is no wall to the left or right
             idx[ADJOINING_WALL_X] = 1
             
-        # ADJOINING_WALL_Y
-        if self.snake_head_y - helper.GRID_SIZE < helper.GRID_SIZE:
-            # There is a wall above
+        # ADJOINING_WALL_Y, 0 if wall above, 1 if no wall above or below (in the same column), 2 if wall below
+        if state[SNAKE_HEAD_Y] - helper.GRID_SIZE < helper.GRID_SIZE:
             idx[ADJOINING_WALL_Y] = 0
-        elif self.snake_head_y + helper.GRID_SIZE > helper.DISPLAY_SIZE - helper.GRID_SIZE:
-            # There is a wall below
+        elif state[SNAKE_HEAD_Y] + helper.GRID_SIZE > helper.DISPLAY_SIZE - helper.GRID_SIZE:
             idx[ADJOINING_WALL_Y] = 2
         else:
-            # There is no wall above or below
             idx[ADJOINING_WALL_Y] = 1
             
+        # FOOD_DIR_X, 0 if food in column to the left, 1 if food in same column, 2 if food in column to the right
+        if state[SNAKE_HEAD_X] < state[FOOD_X]:
+            # Food is in a column to the right
+            idx[FOOD_DIR_X] = 0
+        elif state[SNAKE_HEAD_X] > state[FOOD_X]:
+            # Food is in a column to the left
+            idx[FOOD_DIR_X] = 2
+        else:
+            # Food is in the same column
+            idx[FOOD_DIR_X] = 1
             
-
+        # FOOD_DIR_Y, 0 if food in row above, 1 if food in same row, 2 if food in row below
+        # don't forget y is inverted
+        if state[SNAKE_HEAD_Y] < state[FOOD_Y]:
+            # Food is in a row below
+            idx[FOOD_DIR_Y] = 0
+        elif state[SNAKE_HEAD_Y] > state[FOOD_Y]:
+            # Food is in a row above
+            idx[FOOD_DIR_Y] = 2
+        else:
+            # Food is in the same row
+            idx[FOOD_DIR_Y] = 1
+            
+        # ADJOINING_BODY_TOP, 0 if there is no body above in any row, 1 if there is a body above in any row
+        # Iterate each piece of the body (besides the head) and check if it is above the head
+        idx[ADJOINING_BODY_TOP] = 0
+        for body_piece in state[SNAKE_BODY][1:]:
+            if body_piece[1] < state[SNAKE_HEAD_Y]:
+                idx[ADJOINING_BODY_TOP] = 1
+                break
+            
+        # ADJOINING_BODY_BOTTOM, 0 if there is no body below in any row, 1 if there is a body below in any row
+        idx[ADJOINING_BODY_BOTTOM] = 0
+        for body_piece in state[SNAKE_BODY][1:]:
+            if body_piece[1] > state[SNAKE_HEAD_Y]:
+                idx[ADJOINING_BODY_BOTTOM] = 1
+                break
+            
+        # ADJOINING_BODY_LEFT, 0 if there is no body to the left in any column, 1 if there is a body to the left in any column
+        idx[ADJOINING_BODY_LEFT] = 0
+        for body_piece in state[SNAKE_BODY][1:]:
+            if body_piece[0] < state[SNAKE_HEAD_X]:
+                idx[ADJOINING_BODY_LEFT] = 1
+                break
+            
+        # ADJOINING_BODY_RIGHT, 0 if there is no body to the right in any column, 1 if there is a body to the right in any column
+        idx[ADJOINING_BODY_RIGHT] = 0
+        for body_piece in state[SNAKE_BODY][1:]:
+            if body_piece[0] > state[SNAKE_HEAD_X]:
+                idx[ADJOINING_BODY_RIGHT] = 1
+                break
+            
+        return idx
+            
+            
     # Computing the reward, need not be changed.
 
     def compute_reward(self, points, dead):
