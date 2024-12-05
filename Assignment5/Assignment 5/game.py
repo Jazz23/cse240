@@ -64,9 +64,9 @@ class SnakeGame:
             while not dead:
                 a = self.agent.agent_action(s, self.env.get_points(), dead)
                 s_prime, reward, dead = self.env.step(a)
-                R(s, a, s_prime) = reward
+                R[s, a, s_prime] = reward
                 sample = reward + self.args.gamma * self.agent.pi(s_prime)
-                Q(s, a) = (1 - alpha) * Q(s, a) + alpha * sample
+                Q[s, a] = (1 - alpha) * Q[s, a] + alpha * sample
                 s = s_prime
             
             self.env.reset()

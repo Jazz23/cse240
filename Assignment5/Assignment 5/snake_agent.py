@@ -170,15 +170,6 @@ class SnakeAgent:
     # Our policy function, pi. This is simply the best action according to the current Q table
     def pi(self, s):
         return int(np.argmax(self.Q[s]))
-    
-    def q_learn(self, s, alpha):
-        epsilon = self.Ne
-        gamma = self.gamma
-        dead = False
-        
-        while not dead:
-            action = self.pi(s) if random.randrange(0, 100) < epsilon else random.choice(self.actions)
-            state, points, dead = 
 
     #   This is the code you need to write.
     #   This is the reinforcement learning agent
@@ -203,15 +194,10 @@ class SnakeAgent:
     def agent_action(self, state: list[int], points, dead):
         print("IN AGENT_ACTION")
         s = self.helper_func(state)
-        alpha = 0.7  # Learning rate (lr)
-        episode_count = 1000
+        epsilon = self.Ne
         
-        
-
         # If in TESTING_MODE, simply return the policy
         if not self._train:
             return self.pi(s)
-
-        # Train this state using 1000 episodes of q-learning
-        for _ in range(episode_count):
-            q_value = self.q_learn(s, alpha)
+        
+        return self.pi(s) if random.randrange(0, 100) < epsilon else random.choice(self.actions)
