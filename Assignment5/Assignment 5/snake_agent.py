@@ -178,8 +178,7 @@ class SnakeAgent:
         
         while not dead:
             action = self.pi(s) if random.randrange(0, 100) < epsilon else random.choice(self.actions)
-            state, points, dead = self.env.step(action)
-            action = self.agent.agent_action(state, points, dead)
+            state, points, dead = 
 
     #   This is the code you need to write.
     #   This is the reinforcement learning agent

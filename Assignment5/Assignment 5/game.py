@@ -52,18 +52,19 @@ class SnakeGame:
         #   Use self.env.reset() to reset your game after each iteration.
         for game in range(1, self.args.NUM_TRAIN_ITER + 1):
             print("TRAINING NUMBER : " + str(game))
-            # YOUR CODE HERE
             
-            state = self.env.get_state()
-            points = self.env.get_points()
+            
+            r_table = {}
+            q_table = {}
+            s = self.env.get_state()
             dead = False
-            self.env.display()
-            action = self.agent.agent_action(state, points, dead)
             
-            # while not dead:
-            #     state, points, dead = self.env.step(action)
-            #     action = self.agent.agent_action(state, points, dead)
-                # Update the self.agent.Q variable
+            while not dead:
+                action = self.agent.agent_action(s, self.env.get_points(), dead)
+                s_prime, reward, dead = self.env.step(action)
+                r_table(s, action, s_prime) = reward
+                sample = reward + self.args.gamma * self.agent.pi(s_prime)
+                q_table(s, )
             
             self.env.reset()
                 
