@@ -3,8 +3,8 @@ import argparse
 
 #   Here we define some variables to determine the board size
 DISPLAY_SIZE = 560
-GRID_SIZE = 40
-WALL_SIZE = 40
+GRID_SIZE = 40 # 40 pixels for each square
+WALL_SIZE = 40 # 40 pixels for each wall
 
 #   Here we define some variables for the snake size with respect to the board
 SNAKE_UNIT_SIZE = 40
@@ -31,10 +31,10 @@ NUM_ADJOINING_BODY_RIGHT_STATES=2
 NUM_ACTIONS = 4
 
 #   Here we define a bunch of variables that will determine training, testing and displaying the result
-NUM_TRAIN_ITER = 5000
-NUM_TEST_ITER = 100
-NUM_DISP_ITER = 1
-NUM_TO_STAT = 100
+NUM_TRAIN_ITER = 5000 # How many games to train
+NUM_TEST_ITER = 100 # How many games to test
+NUM_DISP_ITER = 1 # How many games to display
+NUM_TO_STAT = 100 # Every 100 runs, it prints average stats
 snake_head_x = 200
 snake_head_y = 200
 food_x = 120

@@ -154,13 +154,13 @@ class Snake:
         return [0, 1, 2, 3]
 
     #   Returns the current positions and how logn the snake is
-    def get_state(self):
+    def get_state(self) -> list[int]:
         return [
             self.snake_head_x,
             self.snake_head_y,
             self.snake_body,
-            self.food_x,
-            self.food_y
+            self.food_x, # x pos of food
+            self.food_y  # y pos of food
         ]
 
     #   This function makes the move depending on the action passed to it.

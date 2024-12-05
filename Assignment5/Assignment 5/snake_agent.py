@@ -5,13 +5,14 @@ import random
 #   This class has all the functions and variables necessary to implement snake game
 #   We will be using Q learning to do this
 
+
 class SnakeAgent:
 
     #   This is the constructor for the SnakeAgent class
     #   It initializes the actions that can be made,
     #   Ne which is a parameter helpful to perform exploration before deciding next action,
-    #   LPC which ia parameter helpful in calculating learning rate (lr) 
-    #   gamma which is another parameter helpful in calculating next move, in other words  
+    #   LPC which ia parameter helpful in calculating learning rate (lr)
+    #   gamma which is another parameter helpful in calculating next move, in other words
     #            gamma is used to blalance immediate and future reward
     #   Q is the q-table used in Q-learning
     #   N is the next state used to explore possible moves and decide the best one before updating
@@ -27,12 +28,12 @@ class SnakeAgent:
         self.Q = helper.initialize_q_as_zeros()
         self.N = helper.initialize_q_as_zeros()
 
-
     #   This function sets if the program is in training mode or testing mode.
+
     def set_train(self):
         self._train = True
 
-     #   This function sets if the program is in training mode or testing mode.       
+     #   This function sets if the program is in training mode or testing mode.
     def set_eval(self):
         self._train = False
 
@@ -50,24 +51,79 @@ class SnakeAgent:
         self.s = None
         self.a = None
 
-    #   This is a function you should write. 
-    #   Function Helper:IT gets the current state, and based on the 
+    #   This is a function you should write.
+    #   Function Helper:IT gets the current state, and based on the
     #   current snake head location, body and food location,
-    #   determines which move(s) it can make by also using the 
+    #   determines which move(s) it can make by also using the
     #   board variables to see if its near a wall or if  the
-    #   moves it can make lead it into the snake body and so on. 
+    #   moves it can make lead it into the snake body and so on.
     #   This can return a list of variables that help you keep track of
     #   conditions mentioned above.
     def helper_func(self, state):
         print("IN helper_func")
-        # YOUR CODE HERE
-        # YOUR CODE HERE
-        # YOUR CODE HERE
-        # YOUR CODE HERE
-        # YOUR CODE HERE
-
+        # https://edstem.org/us/courses/67912/discussion/5825400
+        
+        # Enum to represent idx:
+        ADJOINING_WALL_X = 0
+        ADJOINING_WALL_Y = 1
+        FOOD_DIR_X = 2
+        FOOD_DIR_Y = 3
+        ADJOINING_BODY_TOP = 4
+        ADJOINING_BODY_BOTTOM = 5
+        ADJOINING_BODY_LEFT = 6
+        ADJOINING_BODY_RIGHT = 7
+        
+        # Enum to represent state:
+        SNAKE_HEAD_X = 0
+        SNAKE_HEAD_Y = 1
+        SNAKE_BODY = 2
+        FOOD_X = 3
+        FOOD_Y = 4
+        
+        # delta_x = delta_y = 0
+        # if action == 0: # Up
+        #     delta_y = -1 * helper.GRID_SIZE
+        # elif action == 1: # Down
+        #     delta_y = helper.GRID_SIZE
+        # elif action == 2: # Left
+        #     delta_x = -1 * helper.GRID_SIZE
+        # elif action == 3: # Right
+        #     delta_x = helper.GRID_SIZE
+        
+        # GRID_SIZE = 40 # 40 pixels for each square
+        #   dead on hitting wall
+        # if (self.snake_head_x < helper.GRID_SIZE or self.snake_head_y < helper.GRID_SIZE or
+        #     self.snake_head_x + helper.GRID_SIZE > helper.DISPLAY_SIZE-helper.GRID_SIZE or self.snake_head_y + helper.GRID_SIZE > helper.DISPLAY_SIZE-helper.GRID_SIZE):
+        #     return True
+        
+        idx: list[int] = [0] * 8
+        
+        # ADJOINING_WALL_X
+        if self.snake_head_x - helper.GRID_SIZE < helper.GRID_SIZE:
+            # There is a wall to the left
+            idx[ADJOINING_WALL_X] = 0
+        elif self.snake_head_x + helper.GRID_SIZE > helper.DISPLAY_SIZE - helper.GRID_SIZE:
+            # There is a wall to the right
+            idx[ADJOINING_WALL_X] = 2
+        else:
+            # There is no wall to the left or right
+            idx[ADJOINING_WALL_X] = 1
+            
+        # ADJOINING_WALL_Y
+        if self.snake_head_y - helper.GRID_SIZE < helper.GRID_SIZE:
+            # There is a wall above
+            idx[ADJOINING_WALL_Y] = 0
+        elif self.snake_head_y + helper.GRID_SIZE > helper.DISPLAY_SIZE - helper.GRID_SIZE:
+            # There is a wall below
+            idx[ADJOINING_WALL_Y] = 2
+        else:
+            # There is no wall above or below
+            idx[ADJOINING_WALL_Y] = 1
+            
+            
 
     # Computing the reward, need not be changed.
+
     def compute_reward(self, points, dead):
         if dead:
             return -1
@@ -76,16 +132,16 @@ class SnakeAgent:
         else:
             return -0.1
 
-    #   This is the code you need to write. 
+    #   This is the code you need to write.
     #   This is the reinforcement learning agent
     #   use the helper_func you need to write above to
-    #   decide which move is the best move that the snake needs to make 
-    #   using the compute reward function defined above. 
-    #   This function also keeps track of the fact that we are in 
+    #   decide which move is the best move that the snake needs to make
+    #   using the compute reward function defined above.
+    #   This function also keeps track of the fact that we are in
     #   training state or testing state so that it can decide if it needs
     #   to update the Q variable. It can use the N variable to test outcomes
-    #   of possible moves it can make. 
-    #   the LPC variable can be used to determine the learning rate (lr), but if 
+    #   of possible moves it can make.
+    #   the LPC variable can be used to determine the learning rate (lr), but if
     #   you're stuck on how to do this, just use a learning rate of 0.7 first,
     #   get your code to work then work on this.
     #   gamma is another useful parameter to determine the learning rate.
@@ -93,11 +149,20 @@ class SnakeAgent:
     #   If you're not in training mode, use the q-table loaded (already done)
     #   to make moves based on that.
     #   the only thing this function should return is the best action to take
-    #   ie. (0 or 1 or 2 or 3) respectively. 
+    #   ie. (0 or 1 or 2 or 3) respectively.
     #   The parameters defined should be enough. If you want to describe more elaborate
     #   states as mentioned in helper_func, use the state variable to contain all that.
-    def agent_action(self, state, points, dead):
+
+    # state is [        return [
+    #         self.snake_head_x,
+    #         self.snake_head_y,
+    #         self.snake_body,
+    #         self.food_x,
+    #         self.food_y
+    #     ]]
+    def agent_action(self, state: list[int], points, dead):
         print("IN AGENT_ACTION")
+        idx = self.helper_func(state)
         # YOUR CODE HERE
         # YOUR CODE HERE
         # YOUR CODE HERE
@@ -106,5 +171,5 @@ class SnakeAgent:
         # YOUR CODE HERE
         # YOUR CODE HERE
 
-        #UNCOMMENT THIS TO RETURN THE REQUIRED ACTION.
-        #return action
+        # UNCOMMENT THIS TO RETURN THE REQUIRED ACTION.
+        # return action

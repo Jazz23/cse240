@@ -2,12 +2,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug Snake Game",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "Assignment5/Assignment 5/game.py",
+            "console": "integratedTerminal"
+        },
+        {
             "type": "node-terminal",
             "request": "launch",
             "name": "Submit Autograder",
             "command": "python3 -m autograder.run.submit --user $EMAIL --pass $PASSWORD Ass*.ipynb",
             "envFile": "${workspaceFolder}/.env",
             "cwd": "${workspaceFolder}/Assignment${input:assignmentNumber}"
+        },
+        {
+            "type": "node-terminal",
+            "request": "launch",
+            "name": "Submit Assignment 5",
+            "command": "python3 -m autograder.run.submit --user $EMAIL --pass $PASSWORD game.py snake_agent.py",
+            "envFile": "${workspaceFolder}/.env",
+            "cwd": "${workspaceFolder}/Assignment5"
         }
     ],
     "inputs": [
