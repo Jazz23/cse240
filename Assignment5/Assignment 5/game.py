@@ -60,9 +60,9 @@ class SnakeGame:
             self.env.display()
             action = self.agent.agent_action(state, points, dead)
             
-            while not dead:
-                state, points, dead = self.env.step(action)
-                action = self.agent.agent_action(state, points, dead)
+            # while not dead:
+            #     state, points, dead = self.env.step(action)
+            #     action = self.agent.agent_action(state, points, dead)
                 # Update the self.agent.Q variable
             
             self.env.reset()

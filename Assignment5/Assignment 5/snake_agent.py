@@ -5,6 +5,12 @@ import random
 #   This class has all the functions and variables necessary to implement snake game
 #   We will be using Q learning to do this
 
+# Enum to represent state:
+SNAKE_HEAD_X = 0
+SNAKE_HEAD_Y = 1
+SNAKE_BODY = 2
+FOOD_X = 3
+FOOD_Y = 4
 
 class SnakeAgent:
 
@@ -19,14 +25,16 @@ class SnakeAgent:
     #           the q-table
     def __init__(self, actions, Ne, LPC, gamma):
         self.actions = actions
-        self.Ne = Ne # Epsilon
-        self.LPC = LPC # Alpha
+        self.Ne = Ne  # Epsilon
+        self.LPC = LPC  # Used in calculating Alpha
         self.gamma = gamma
         self.reset()
 
         # Create the Q and N Table to work with
-        self.Q = helper.initialize_q_as_zeros() # Q table (index like self.Q[idx])
-        self.N = helper.initialize_q_as_zeros() # N table (index like self.N[idx])
+        # Q table (index like self.Q[idx])
+        self.Q = helper.initialize_q_as_zeros()
+        # N table (index like self.N[idx])
+        self.N = helper.initialize_q_as_zeros()
 
     #   This function sets if the program is in training mode or testing mode.
 
@@ -62,7 +70,7 @@ class SnakeAgent:
     def helper_func(self, state):
         print("IN helper_func")
         # https://edstem.org/us/courses/67912/discussion/5825400
-        
+
         # Enum to represent idx:
         ADJOINING_WALL_X = 0
         ADJOINING_WALL_Y = 1
@@ -72,19 +80,12 @@ class SnakeAgent:
         ADJOINING_BODY_BOTTOM = 5
         ADJOINING_BODY_LEFT = 6
         ADJOINING_BODY_RIGHT = 7
-        
-        # Enum to represent state:
-        SNAKE_HEAD_X = 0
-        SNAKE_HEAD_Y = 1
-        SNAKE_BODY = 2
-        FOOD_X = 3
-        FOOD_Y = 4
-        
+
         # Return vector
         idx: list[int] = [0] * 8
-        
+
         # Adjoining wall inference is taken from board.py Snake.move() hit wall clauses
-        
+
         # ADJOINING_WALL_X, 0 if wall to the left, 1 if no wall to the left or right (in the same row), 2 if wall to the right
         if state[SNAKE_HEAD_X] - helper.GRID_SIZE < helper.GRID_SIZE:
             idx[ADJOINING_WALL_X] = 0
@@ -92,7 +93,7 @@ class SnakeAgent:
             idx[ADJOINING_WALL_X] = 2
         else:
             idx[ADJOINING_WALL_X] = 1
-            
+
         # ADJOINING_WALL_Y, 0 if wall above, 1 if no wall above or below (in the same column), 2 if wall below
         if state[SNAKE_HEAD_Y] - helper.GRID_SIZE < helper.GRID_SIZE:
             idx[ADJOINING_WALL_Y] = 0
@@ -100,7 +101,7 @@ class SnakeAgent:
             idx[ADJOINING_WALL_Y] = 2
         else:
             idx[ADJOINING_WALL_Y] = 1
-            
+
         # FOOD_DIR_X, 0 if food in column to the left, 1 if food in same column, 2 if food in column to the right
         if state[SNAKE_HEAD_X] < state[FOOD_X]:
             # Food is in a column to the right
@@ -111,7 +112,7 @@ class SnakeAgent:
         else:
             # Food is in the same column
             idx[FOOD_DIR_X] = 1
-            
+
         # FOOD_DIR_Y, 0 if food in row above, 1 if food in same row, 2 if food in row below
         # don't forget y is inverted
         if state[SNAKE_HEAD_Y] < state[FOOD_Y]:
@@ -123,7 +124,7 @@ class SnakeAgent:
         else:
             # Food is in the same row
             idx[FOOD_DIR_Y] = 1
-            
+
         # ADJOINING_BODY_TOP, 0 if there is no body above in any row, 1 if there is a body above in any row
         # Iterate each piece of the body (besides the head) and check if it is above the head
         idx[ADJOINING_BODY_TOP] = 0
@@ -131,32 +132,31 @@ class SnakeAgent:
             if body_piece[1] < state[SNAKE_HEAD_Y]:
                 idx[ADJOINING_BODY_TOP] = 1
                 break
-            
+
         # ADJOINING_BODY_BOTTOM, 0 if there is no body below in any row, 1 if there is a body below in any row
         idx[ADJOINING_BODY_BOTTOM] = 0
         for body_piece in state[SNAKE_BODY][1:]:
             if body_piece[1] > state[SNAKE_HEAD_Y]:
                 idx[ADJOINING_BODY_BOTTOM] = 1
                 break
-            
+
         # ADJOINING_BODY_LEFT, 0 if there is no body to the left in any column, 1 if there is a body to the left in any column
         idx[ADJOINING_BODY_LEFT] = 0
         for body_piece in state[SNAKE_BODY][1:]:
             if body_piece[0] < state[SNAKE_HEAD_X]:
                 idx[ADJOINING_BODY_LEFT] = 1
                 break
-            
+
         # ADJOINING_BODY_RIGHT, 0 if there is no body to the right in any column, 1 if there is a body to the right in any column
         idx[ADJOINING_BODY_RIGHT] = 0
         for body_piece in state[SNAKE_BODY][1:]:
             if body_piece[0] > state[SNAKE_HEAD_X]:
                 idx[ADJOINING_BODY_RIGHT] = 1
                 break
-            
+
         # Convert to tuple and return
         return tuple(idx)
-            
-            
+
     # Computing the reward, need not be changed.
 
     def compute_reward(self, points, dead):
@@ -166,6 +166,20 @@ class SnakeAgent:
             return 1
         else:
             return -0.1
+        
+    # Our policy function, pi. This is simply the best action according to the current Q table
+    def pi(self, s):
+        return int(np.argmax(self.Q[s]))
+    
+    def q_learn(self, s, alpha):
+        epsilon = self.Ne
+        gamma = self.gamma
+        dead = False
+        
+        while not dead:
+            action = self.pi(s) if random.randrange(0, 100) < epsilon else random.choice(self.actions)
+            state, points, dead = self.env.step(action)
+            action = self.agent.agent_action(state, points, dead)
 
     #   This is the code you need to write.
     #   This is the reinforcement learning agent
@@ -189,18 +203,16 @@ class SnakeAgent:
     #   states as mentioned in helper_func, use the state variable to contain all that.
     def agent_action(self, state: list[int], points, dead):
         print("IN AGENT_ACTION")
-        idx = self.helper_func(state)
-        actions = self.Q[idx] # Weighted actions to take
-        print(idx)
+        s = self.helper_func(state)
+        alpha = 0.7  # Learning rate (lr)
+        episode_count = 1000
         
-        action = 0
-        # YOUR CODE HERE
-        # YOUR CODE HERE
-        # YOUR CODE HERE
-        # YOUR CODE HERE
-        # YOUR CODE HERE
-        # YOUR CODE HERE
-        # YOUR CODE HERE
+        
 
-        # UNCOMMENT THIS TO RETURN THE REQUIRED ACTION.
-        return action
+        # If in TESTING_MODE, simply return the policy
+        if not self._train:
+            return self.pi(s)
+
+        # Train this state using 1000 episodes of q-learning
+        for _ in range(episode_count):
+            q_value = self.q_learn(s, alpha)
