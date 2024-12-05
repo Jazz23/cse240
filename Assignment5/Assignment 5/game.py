@@ -45,6 +45,8 @@ class SnakeGame:
         NUM_TO_STAT = self.args.NUM_TO_STAT
         self.points_results = []
         start = time.time()
+        
+        alpha = 0.7  # Learning rate (lr)
 
         #   This loop will train for required number of times
         #   WRITE YOUR CODE IN THIS LOOP TO CALL THE TRAINING FUNCTION.
@@ -54,20 +56,20 @@ class SnakeGame:
             print("TRAINING NUMBER : " + str(game))
             
             
-            r_table = {}
-            q_table = {}
+            R = {}
+            Q = {}
             s = self.env.get_state()
             dead = False
             
             while not dead:
-                action = self.agent.agent_action(s, self.env.get_points(), dead)
-                s_prime, reward, dead = self.env.step(action)
-                r_table(s, action, s_prime) = reward
+                a = self.agent.agent_action(s, self.env.get_points(), dead)
+                s_prime, reward, dead = self.env.step(a)
+                R(s, a, s_prime) = reward
                 sample = reward + self.args.gamma * self.agent.pi(s_prime)
-                q_table(s, )
+                Q(s, a) = (1 - alpha) * Q(s, a) + alpha * sample
+                s = s_prime
             
             self.env.reset()
-                
                 
             
            
