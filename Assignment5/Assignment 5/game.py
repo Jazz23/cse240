@@ -1,6 +1,7 @@
+import random
 import pygame
 from pygame.locals import *
-from snake_agent import SnakeAgent
+from snake_agent import COUNT, SnakeAgent
 from board import BoardEnv
 import helper
 import time
@@ -33,8 +34,8 @@ class SnakeGame:
     def play(self):
         if self.args.NUM_TRAIN_ITER != 0:
             self.do_training()
-        self.do_testing()
-        self.show_games()
+        # self.do_testing()
+        # self.show_games()
 
     #   This is the function that does calls the functions to do reinforcement training
     #       as many times as specified. It also prints the statistics based on the
@@ -52,27 +53,25 @@ class SnakeGame:
         #   Use self.env.reset() to reset your game after each iteration.
         for game in range(1, self.args.NUM_TRAIN_ITER + 1):
             # print("TRAINING NUMBER : " + str(game))
-            
-            # Each iteration of this for loop is an "Episode"
-            s = self.env.get_state()
-            points = 0
+            state = self.env.get_state()
+            state.append(game) # Add episode count to game state
             dead = False
-            action = self.agent.agent_action(s, points, dead)
+            action = self.agent.agent_action(state, 0, dead)
             
             while not dead:
-                s, points, dead = self.env.step(action)
-                action = self.agent.agent_action(s, points, dead)
+                state, points, dead = self.env.step(action)
+                state.append(game) # Add episode count to game state
+                action = self.agent.agent_action(state, points, dead)
+                
+            self.env.reset()
+            self.points_results.append(points)
             
-            # Reset agent and decay episolon and learning rate (alpha)
+            self.agent.reset()
             self.agent.alpha *= 0.99 # Decay learning rate to converge
             # self.agent.alpha = max(self.agent.alpha, 0.1) # Clamp alpha to 0.1
             
             self.agent.epsilon *= 0.99 # Decay epsilon so it's not greedy
             # self.agent.epsilon = max(self.agent.epsilon, 0.1) # Clamp epsilon to 0.1
-            
-            self.points_results.append(points)
-            self.env.reset()
-            self.agent.reset()
                 
             
            

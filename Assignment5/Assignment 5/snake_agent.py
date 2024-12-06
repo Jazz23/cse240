@@ -11,6 +11,7 @@ SNAKE_HEAD_Y = 1
 SNAKE_BODY = 2
 FOOD_X = 3
 FOOD_Y = 4
+COUNT = 5
 
 class SnakeAgent:
 
@@ -36,7 +37,7 @@ class SnakeAgent:
         # Q table (index like self.Q[idx])
         self.Q = helper.initialize_q_as_zeros()
         # N table (index like self.N[idx])
-        self.N = helper.initialize_q_as_zeros()
+        self.N = helper.initialize_q_as_zeros() # Baddness
 
     #   This function sets if the program is in training mode or testing mode.
 
@@ -191,12 +192,22 @@ class SnakeAgent:
     #   states as mentioned in helper_func, use the state variable to contain all that.
     def agent_action(self, state, points, dead):
         # print("IN AGENT_ACTION")
+        s_prime = self.helper_func(state) # Resulting state was passed in
         
         # What action we should take based on current Q table for a given state
         def policy(target_state):
             return int(np.argmax(self.Q[target_state]))
         
-        s_prime = self.helper_func(state) # Resulting state was passed in
+        # Exploration function to get maximum expected utility
+        def explore():
+            def f(u, n):
+                return u + n / state[COUNT]
+            
+            options = [f(self.Q[s_prime][a_prime], self.N[s_prime][a_prime]) for a_prime in self.actions]
+            return np.max(options)
+            
+            
+        
         
         # This function is called *after* an action takes place, and we received the reward as points.
         # The state parameter passed in will be our s_prime.
@@ -213,10 +224,12 @@ class SnakeAgent:
         alpha = self.alpha # Learning rate
         
         # Sample = Current reward + discounted expected future utility
-        sample = reward + self.gamma * np.max(self.Q[s_prime])
+        # sample = reward + self.gamma * np.max(self.Q[s_prime])
         
-        # Update Q table with new results
-        self.Q[s][a] = (1 - alpha) * self.Q[s][a] + alpha * sample
+        # Update Q and N tables with new results
+        # self.Q[s][a] = (1 - alpha) * self.Q[s][a] + alpha * sample
+        self.Q[s][a] = alpha * reward + self.gamma * explore()
+        self.N[s][a] = self.Q[s][a]
         
         # Save new points, new state, next action
         self.points = points
