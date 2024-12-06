@@ -112,14 +112,13 @@ class SnakeGame:
                 
             points_results.append(points)
             self.env.reset()
-            self.agent.reset()
 
         # UNCOMMENT THE CODE BELOW TO PRINT STATISTICS
-        # print("Testing takes", time.time() - start, "seconds")
-        # print("Number of Games:", len(points_results))
-        # print("Average Points:", sum(points_results)/len(points_results))
-        # print("Max Points:", max(points_results))
-        # print("Min Points:", min(points_results))
+        print("Testing takes", time.time() - start, "seconds")
+        print("Number of Games:", len(points_results))
+        print("Average Points:", sum(points_results)/len(points_results))
+        print("Max Points:", max(points_results))
+        print("Min Points:", min(points_results))
 
     #   This function is the one where the game will be displayed.
     #   This function is already written for you. No changes are necessary
