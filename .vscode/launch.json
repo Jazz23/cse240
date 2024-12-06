@@ -6,7 +6,8 @@
             "type": "debugpy",
             "request": "launch",
             "program": "Assignment5/Assignment 5/game.py",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "args": ["--DISP", "5"]
         },
         {
             "type": "node-terminal",

@@ -60,7 +60,7 @@ class SnakeAgent:
         self.s = None
         self.a = None
         self.alpha = 0.7
-        self.epsilon = 0.7
+        self.epsilon = 1
 
     #   This is a function you should write.
     #   Function Helper:IT gets the current state, and based on the
@@ -193,7 +193,7 @@ class SnakeAgent:
     def agent_action(self, state, points, dead):
         # print("IN AGENT_ACTION")
         
-        # What action we should take based on current Q table and a given input state
+        # What action we should take based on current Q table for a given state
         def policy(target_state):
             return int(np.argmax(self.Q[target_state]))
         
@@ -206,13 +206,12 @@ class SnakeAgent:
         if not self._train:
             return policy(s_prime)
         
-        
         # If in TRAINING_MODE, learn from this experience
-        s = self.s # Pull last saved state
-        a = self.a # Pull last saved action
+        s = self.s # The s we were at previously
+        a = self.a # Action that got us to this new s_prime
         reward = self.compute_reward(points, dead)
         epsilon = self.epsilon # self.Ne
-        alpha = self.alpha # Learning rate (lr)
+        alpha = self.alpha # Learning rate
         
         # Sample = Current reward + discounted expected future utility
         sample = reward + self.gamma * np.max(self.Q[s_prime])
@@ -220,10 +219,11 @@ class SnakeAgent:
         # Update Q table with new results
         self.Q[s][a] = (1 - alpha) * self.Q[s][a] + alpha * sample
         
-        # Save new points, new state, next action, and decay our learning rate
+        # Save new points, new state, next action
         self.points = points
         self.s = s_prime 
         self.a = random.choice(self.actions) if random.random() < epsilon else policy(s_prime)
-        self.alpha *= 0.999 # Decay learning rate to converge
-        self.epsilon *= 0.999 # Decay epsilon so it's not greedy
+        
+        self.alpha *= 0.99 # Decay learning rate to converge
+        # self.epsilon *= 0.999 # Decay epsilon so it's not greedy
         return self.a
