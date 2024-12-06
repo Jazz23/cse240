@@ -55,19 +55,13 @@ class SnakeGame:
         for game in range(1, self.args.NUM_TRAIN_ITER + 1):
             print("TRAINING NUMBER : " + str(game))
             
-            
-            R = {}
-            Q = {}
             s = self.env.get_state()
+            points = self.env.get_points()
             dead = False
             
             while not dead:
-                a = self.agent.agent_action(s, self.env.get_points(), dead)
-                s_prime, reward, dead = self.env.step(a)
-                R[s, a, s_prime] = reward
-                sample = reward + self.args.gamma * self.agent.pi(s_prime)
-                Q[s, a] = (1 - alpha) * Q[s, a] + alpha * sample
-                s = s_prime
+                action = self.agent.agent_action(s, points, dead)
+                s, points, dead = self.env.step(action)
             
             self.env.reset()
                 
