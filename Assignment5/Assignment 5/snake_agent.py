@@ -25,10 +25,11 @@ class SnakeAgent:
     #           the q-table
     def __init__(self, actions, Ne, LPC, gamma):
         self.actions = actions
-        self.Ne = Ne  # Epsilon
-        self.LPC = LPC  # Used in calculating Alpha
+        self.Ne = Ne
+        self.LPC = LPC
         self.gamma = gamma
-        self.alpha = 0.7 # Start with learning rate of 0.7
+        self.epsilon = 1
+        self.alpha = 0.7
         self.reset()
 
         # Create the Q and N Table to work with
@@ -59,8 +60,6 @@ class SnakeAgent:
         self.points = 0
         self.s = None
         self.a = None
-        self.alpha = 0.7
-        self.epsilon = 1
 
     #   This is a function you should write.
     #   Function Helper:IT gets the current state, and based on the
@@ -210,7 +209,7 @@ class SnakeAgent:
         s = self.s # The s we were at previously
         a = self.a # Action that got us to this new s_prime
         reward = self.compute_reward(points, dead)
-        epsilon = self.epsilon # self.Ne
+        epsilon = self.epsilon
         alpha = self.alpha # Learning rate
         
         # Sample = Current reward + discounted expected future utility
@@ -223,7 +222,4 @@ class SnakeAgent:
         self.points = points
         self.s = s_prime 
         self.a = random.choice(self.actions) if random.random() < epsilon else policy(s_prime)
-        
-        self.alpha *= 0.99 # Decay learning rate to converge
-        # self.epsilon *= 0.999 # Decay epsilon so it's not greedy
         return self.a

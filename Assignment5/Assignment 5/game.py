@@ -53,6 +53,7 @@ class SnakeGame:
         for game in range(1, self.args.NUM_TRAIN_ITER + 1):
             print("TRAINING NUMBER : " + str(game))
             
+            # Each iteration of this for loop is an "Episode"
             s = self.env.get_state()
             points = self.env.get_points()
             dead = False
@@ -62,8 +63,12 @@ class SnakeGame:
                 s, points, dead = self.env.step(action)
                 action = self.agent.agent_action(s, points, dead)
             
-            self.env.reset()
+            # Reset agent and decay episolon and learning rate (alpha)
+            self.agent.alpha *= 0.999 # Decay learning rate to converge
+            self.agent.epsilon *= 0.999 # Decay epsilon so it's not greedy
             self.agent.reset()
+            
+            self.env.reset()
                 
             
            
