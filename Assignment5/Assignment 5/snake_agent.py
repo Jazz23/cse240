@@ -192,32 +192,33 @@ class SnakeAgent:
         print("IN AGENT_ACTION")
         
         # Our policy function, pi. This is simply the best action according to the current Q table
-        def pi(self, s):
+        def pi(s):
             return int(np.argmax(self.Q[s]))
+        
+        s_prime = self.helper_func(state) # Next state
         
         # This function is called *after* an action takes place, and we received the reward as points.
         # The state passed in will be our s_prime.
         
         # If in TESTING_MODE, simply return the policy
         if not self._train:
-            return self.pi(s)
+            return pi(s_prime)
         
         # If in TRAINING_MODE, update our q-table.
         s = self.s # Pull last saved state
         a = self.a # Pull last saved action
-        s_prime = self.helper_func(state) # Next state
         epsilon = self.Ne
         alpha = self.alpha # Learning rate (lr)
         reward = points
         
         # Sample = Current reward + discounted expected reward using our current Q table
-        sample = reward + self.args.gamma * self.agent.pi(s_prime)
+        sample = reward + self.gamma * pi(s_prime)
         
         # Update Q table with new results
         self.Q[s][a] = (1 - alpha) * self.Q[s][a] + alpha * sample
         
         # Save new state, new action, and decay our learning rate
         self.s = s_prime 
-        self.a = self.pi(s) if random.randrange(0, 100) < epsilon else random.choice(self.actions)
+        self.a = pi(s) if random.randrange(0, 100) < epsilon else random.choice(self.actions)
         self.alpha *= 0.99 # Decay learning rate to converge
         return self.a
