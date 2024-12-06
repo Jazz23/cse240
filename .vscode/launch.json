@@ -20,7 +20,7 @@
             "type": "node-terminal",
             "request": "launch",
             "name": "Submit Assignment 5",
-            "command": "python3 -m autograder.run.submit --user $EMAIL --pass $PASSWORD game.py snake_agent.py",
+            "command": "python3 -m autograder.run.submit --user $EMAIL --pass $PASSWORD \"Assignment 5/game.py\" \"Assignment 5/snake_agent.py\"",
             "envFile": "${workspaceFolder}/.env",
             "cwd": "${workspaceFolder}/Assignment5"
         }
