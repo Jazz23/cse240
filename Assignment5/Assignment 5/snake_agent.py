@@ -201,7 +201,7 @@ class SnakeAgent:
         # Exploration function to get maximum expected utility
         def explore():
             def f(u, n):
-                return u + n / state[COUNT]
+                return u + state[COUNT] / n / 
             
             options = [f(self.Q[s_prime][a_prime], self.N[s_prime][a_prime]) for a_prime in self.actions]
             return np.max(options)
