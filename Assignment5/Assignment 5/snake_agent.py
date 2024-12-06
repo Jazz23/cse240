@@ -59,6 +59,7 @@ class SnakeAgent:
         self.points = 0
         self.s = None
         self.a = None
+        self.alpha = 0.7
 
     #   This is a function you should write.
     #   Function Helper:IT gets the current state, and based on the
@@ -69,7 +70,7 @@ class SnakeAgent:
     #   This can return a list of variables that help you keep track of
     #   conditions mentioned above.
     def helper_func(self, state):
-        print("IN helper_func")
+        # print("IN helper_func")
         # https://edstem.org/us/courses/67912/discussion/5825400
 
         # Enum to represent idx:
@@ -189,36 +190,36 @@ class SnakeAgent:
     #   The parameters defined should be enough. If you want to describe more elaborate
     #   states as mentioned in helper_func, use the state variable to contain all that.
     def agent_action(self, state, points, dead):
-        print("IN AGENT_ACTION")
+        # print("IN AGENT_ACTION")
         
-        # Our policy function, pi. This is simply the best action according to the current Q table
-        def pi(s):
-            return int(np.argmax(self.Q[s]))
+        def policy(sstate):
+            return int(np.argmax(self.Q[sstate]))
         
         s_prime = self.helper_func(state) # Next state
         
         # This function is called *after* an action takes place, and we received the reward as points.
-        # The state passed in will be our s_prime.
+        # The state parameter passed in will be our s_prime.
         
         # If in TESTING_MODE, simply return the policy
         if not self._train:
-            return pi(s_prime)
+            return policy(s_prime)
         
         # If in TRAINING_MODE, update our q-table.
         s = self.s # Pull last saved state
         a = self.a # Pull last saved action
-        epsilon = self.Ne
+        reward = self.compute_reward(points, dead)
+        epsilon = 0.8 # self.Ne
         alpha = self.alpha # Learning rate (lr)
-        reward = points
         
-        # Sample = Current reward + discounted expected reward using our current Q table
-        sample = reward + self.gamma * pi(s_prime)
+        # Sample = Current reward + discounted expected future utility
+        sample = reward + self.gamma * policy(s_prime)
         
         # Update Q table with new results
         self.Q[s][a] = (1 - alpha) * self.Q[s][a] + alpha * sample
         
-        # Save new state, new action, and decay our learning rate
+        # Save new points, new state, next action, and decay our learning rate
+        self.points = points
         self.s = s_prime 
-        self.a = pi(s) if random.randrange(0, 100) < epsilon else random.choice(self.actions)
+        self.a = random.choice(self.actions) if random.random() < epsilon else policy(s_prime)
         self.alpha *= 0.99 # Decay learning rate to converge
         return self.a
