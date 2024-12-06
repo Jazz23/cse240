@@ -28,6 +28,7 @@ class SnakeAgent:
         self.Ne = Ne  # Epsilon
         self.LPC = LPC  # Used in calculating Alpha
         self.gamma = gamma
+        self.alpha = 0.7 # Start with learning rate of 0.7
         self.reset()
 
         # Create the Q and N Table to work with
@@ -166,10 +167,6 @@ class SnakeAgent:
             return 1
         else:
             return -0.1
-        
-    # Our policy function, pi. This is simply the best action according to the current Q table
-    def pi(self, s):
-        return int(np.argmax(self.Q[s]))
 
     #   This is the code you need to write.
     #   This is the reinforcement learning agent
@@ -191,21 +188,36 @@ class SnakeAgent:
     #   ie. (0 or 1 or 2 or 3) respectively.
     #   The parameters defined should be enough. If you want to describe more elaborate
     #   states as mentioned in helper_func, use the state variable to contain all that.
-    def agent_action(self, state: list[int], points, dead):
+    def agent_action(self, state, points, dead):
         print("IN AGENT_ACTION")
-        s = self.helper_func(state)
-        epsilon = self.Ne
+        
+        # Our policy function, pi. This is simply the best action according to the current Q table
+        def pi(self, s):
+            return int(np.argmax(self.Q[s]))
+        
+        # This function is called *after* an action takes place, and we received the reward as points.
+        # The state passed in will be our s_prime.
         
         # If in TESTING_MODE, simply return the policy
         if not self._train:
             return self.pi(s)
         
-        while not dead:
-                a = self.agent.agent_action(s, self.env.get_points(), dead)
-                s_prime, reward, dead = self.env.step(a)
-                R[s, a, s_prime] = reward
-                sample = reward + self.args.gamma * self.agent.pi(s_prime)
-                Q[s, a] = (1 - alpha) * Q[s, a] + alpha * sample
-                s = s_prime
+        # If in TRAINING_MODE, update our q-table.
+        s = self.s # Pull last saved state
+        a = self.a # Pull last saved action
+        s_prime = self.helper_func(state) # Next state
+        epsilon = self.Ne
+        alpha = self.alpha # Learning rate (lr)
+        reward = points
         
-        return self.pi(s) if random.randrange(0, 100) < epsilon else random.choice(self.actions)
+        # Sample = Current reward + discounted expected reward using our current Q table
+        sample = reward + self.args.gamma * self.agent.pi(s_prime)
+        
+        # Update Q table with new results
+        self.Q[s][a] = (1 - alpha) * self.Q[s][a] + alpha * sample
+        
+        # Save new state, new action, and decay our learning rate
+        self.s = s_prime 
+        self.a = self.pi(s) if random.randrange(0, 100) < epsilon else random.choice(self.actions)
+        self.alpha *= 0.99 # Decay learning rate to converge
+        return self.a
