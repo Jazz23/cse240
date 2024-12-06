@@ -45,6 +45,9 @@ class SnakeGame:
         NUM_TO_STAT = self.args.NUM_TO_STAT
         self.points_results = []
         start = time.time()
+        
+        self.agent.alpha = 0.7
+        self.agent.epsilon = 1
 
         #   This loop will train for required number of times
         #   WRITE YOUR CODE IN THIS LOOP TO CALL THE TRAINING FUNCTION.
@@ -65,14 +68,11 @@ class SnakeGame:
             
             # Reset agent and decay episolon and learning rate (alpha)
             self.agent.alpha *= 0.99 # Decay learning rate to converge
-            # self.agent.alpha = max(self.agent.alpha, 0.1) # Clamp alpha to 0.1
-            
             self.agent.epsilon *= 0.99 # Decay epsilon so it's not greedy
-            # self.agent.epsilon = max(self.agent.epsilon, 0.1) # Clamp epsilon to 0.1
+            self.agent.reset()
             
             self.points_results.append(points)
             self.env.reset()
-            self.agent.reset()
                 
             
            
